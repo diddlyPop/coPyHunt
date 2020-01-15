@@ -1,0 +1,6 @@
+image.png 
+yolo-coco/yolov3.weights
+.idea/
+__pycache__/
+steps.txt
+venv/
