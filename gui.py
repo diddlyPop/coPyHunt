@@ -5,7 +5,9 @@
 #   by Kyle Guss
 #
 #   known problems:
-#       'display_item' size constrained when initialized, will be a problem when updating item
+#       'display_item' size constrained when initialized, item sometimes blank due to size constraints
+#       size of entire window changes with dynamic image size
+#           need to either scale image down or find another way to keep window size somewhat static
 #
 #
 #############################################################################################################
