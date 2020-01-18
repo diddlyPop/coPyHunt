@@ -5,7 +5,7 @@
 #   by Kyle Guss
 #
 #   known problems:
-#       'display_item' size constrained when initialized, item sometimes blank due to size constraints
+#       FIXED - 'display_item' size constrained when initialized, item sometimes blank due to size constraints
 #       size of entire window changes with dynamic image size
 #           need to either scale image down or find another way to keep window size somewhat static
 #
@@ -28,9 +28,18 @@ class Game:
         self.current_item = random.choice(self.labels)
         self.current_round = 0
 
+        self.display_header = sg.Text('Welcome to coPy. Find the item',
+                                      key='_HEAD_',
+                                      background_color='Black')
         self.display_image = sg.Image(filename="hunt.png")
-        self.display_round = sg.Text(f"Level: {self.current_round}")
-        self.display_item = sg.Text(f"Item: {self.current_item}")
+        self.display_round = sg.Text(f"Level: {self.current_round}",
+                                     key='_ROUND_',
+                                     size=(15, 1),
+                                     background_color='Black')
+        self.display_item = sg.Text(f"Item: {self.current_item}",
+                                    key='_ITEM_',
+                                    size=(15, 1),
+                                    background_color='Black')
 
         self.yolo_classifier = yolo.ImageClassifier()
 
@@ -42,6 +51,7 @@ class Game:
         self.display_item.update(f"Item: {self.current_item}")
 
     def scan_image(self):  # Takes image from clipboard, compares to temp. If UNIQUE then save photo.
+        print(self.current_item)
         try:
             img = ImageGrab.grabclipboard()  # Take image from clipboard
             img.save("image.png", format='PNG')
@@ -50,10 +60,10 @@ class Game:
             print(e)
 
     def start(self):
-        sg.theme('DarkAmber')  # Add a touch of color
+        sg.theme_background_color('Black')
 
         # All the stuff inside your window.
-        layout = [[sg.Text('Welcome to coPy. This is a scavenger hunt')],
+        layout = [[self.display_header],
                   [self.display_round],
                   [self.display_item],
                   [self.display_image],
@@ -70,6 +80,7 @@ class Game:
             if event == '_SCAN_':
                 self.scan_image()
                 self.new_round()
+                window['_ITEM_'].update(value=f"Item: {self.current_item}")
 
         window.close()
 
