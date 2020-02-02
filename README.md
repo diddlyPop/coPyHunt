@@ -4,7 +4,7 @@ scavenger hunt game supervised by an image classifier
 ------------------------------------------------------------
 
 # install instructions
-
+known PySimpleGui problems on Mac, working well on Windows w/ python3.7.1. will move to python3.7.6 soon.
 ```
 git clone https://github.com/diddlypop/coPyHunt.git
 cd coPyHunt
