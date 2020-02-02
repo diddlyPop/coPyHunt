@@ -27,6 +27,7 @@ class Game:
 
         self.current_item = random.choice(self.labels)
         self.current_round = 0
+        self.points = 0
 
         self.display_header = sg.Text('Welcome to coPy. Find the item',
                                       key='_HEAD_',
@@ -41,7 +42,13 @@ class Game:
                                     size=(15, 1),
                                     background_color='Black')
 
+        self.display_points = sg.Text(f"Points: {self.points}",
+                                      key='_POINTS_',
+                                      size=(15, 1),
+                                      background_color='Black')
+
         self.yolo_classifier = yolo.ImageClassifier()
+        self.curr_round_classes = []
 
     def new_round(self):
         self.current_round += 1
@@ -49,6 +56,7 @@ class Game:
         self.display_image.update(filename="image.png")  # Ideally  only be updated when unique photo is found
         self.display_round.update(f"Level: {self.current_round}")
         self.display_item.update(f"Item: {self.current_item}")
+        self.display_points.update(f"Points: {self.points}")
 
     def scan_image(self):  # Takes image from clipboard, compares to temp. If UNIQUE then save photo.
         print(self.current_item)
@@ -56,15 +64,23 @@ class Game:
             img = ImageGrab.grabclipboard()  # Take image from clipboard
             img.save("image.png", format='PNG')
             self.yolo_classifier.classify()
+            self.curr_round_classes = self.yolo_classifier.listClassesFromClassify()
         except AttributeError as e:  # Catches if clipboard contents not Image
             print(e)
+
+    def determine_points(self):
+        if self.current_item in self.curr_round_classes:
+            self.points += 1
+        else:
+            print(f"{self.current_item} not found")
+            print(self.curr_round_classes)
 
     def start(self):
         sg.theme_background_color('Black')
 
         # All the stuff inside your window.
         layout = [[self.display_header],
-                  [self.display_round],
+                  [self.display_round, self.display_points],
                   [self.display_item],
                   [self.display_image],
                   [sg.Button('Scan', key='_SCAN_')],
@@ -77,8 +93,9 @@ class Game:
             event, values = window.read()
             if event in (None, 'Cancel'):  # If user closes window or clicks cancel
                 break
-            if event == '_SCAN_':
+            elif event == '_SCAN_':
                 self.scan_image()
+                self.determine_points()
                 self.new_round()
                 window['_ITEM_'].update(value=f"Item: {self.current_item}")
 
