@@ -13,6 +13,8 @@ class ImageClassifier:
         labels_path = os.path.sep.join(["yolo-coco", "coco.names"])  # Pre-trained class labels
         self.LABELS = open(labels_path).read().strip().split("\n")
 
+        self.last_classes = []
+
         # Initialize a list of colors to represent each possible class label
         np.random.seed(42)
         self.COLORS = np.random.randint(0, 255, size=(len(self.LABELS), 3), dtype="uint8")
@@ -25,6 +27,7 @@ class ImageClassifier:
         self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
 
     def classify(self):
+        self.last_classes.clear()
         # Load our input image and grab its spatial dimensions
         image = cv2.imread("image.png")
         (H, W) = image.shape[:2]
@@ -87,9 +90,11 @@ class ImageClassifier:
                 color = [int(c) for c in self.COLORS[class_IDs[i]]]
                 cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
                 text = "{}: {:.4f}".format(self.LABELS[class_IDs[i]], confidences[i])
+                self.last_classes.append(self.LABELS[class_IDs[i]])
                 cv2.putText(image, text, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
         # Write the image back to disk
         cv2.imwrite('image.png', image)
 
-
+    def listClassesFromClassify(self):
+        return self.last_classes
